@@ -1,0 +1,143 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% © 2025-pres. Christian C.
+% Licence : MIT
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{expl3}
+
+
+\newcount\QuestionNum
+\global\advance\QuestionNum by 1
+\newcount\ChoiceNum
+
+\ExplSyntaxOn
+
+% Define the Multiple or Single Answer Mode
+\bool_new:N \g_multiple_answer_mode
+\bool_set_true:N \g_multiple_answer_mode
+
+% Switch between both modes
+\def\MultipleAnswersMode{
+    \bool_set_true:N \g_multiple_answer_mode
+    Question\ \the\QuestionNum\ (\textit{several\ answers}).\vspace{-0.2cm} \\  \rule{\textwidth}{0.5pt}.
+}
+\def\SingleAnswerMode{
+    \bool_set_false:N \g_multiple_answer_mode
+    Question\ \the\QuestionNum\ (\textit{one\ answer})\vspace{-0.2cm} \\  \rule{\textwidth}{0.5pt}.
+}
+
+% Checkbox depending on the number of answers
+\def\CheckBoxShape{
+    \bool_if:NTF \g_multiple_answer_mode
+  { square }  % Multiple answers
+  { circle } % One answer
+}
+
+% Checkbox depending on the number of answers
+\def\SingleAnswerButtonOption{
+    \bool_if:NTF \g_multiple_answer_mode
+  { }  % If true
+  { Q\the\QuestionNum } % If false
+}
+
+
+
+\ExplSyntaxOff
+
+
+\def\newChoice{
+    % Update the Choice id number
+    \global\advance\ChoiceNum by 1
+    %
+    % Checkbox
+    \makebox[0pt][l]{%
+        \actionsocg{Q\the\QuestionNum C\the\ChoiceNum}{}{}%
+        {\faIcon[regular]{\CheckBoxShape}}%
+    }%
+    %
+    % Checkmark icon (OCG)
+    \begin{ocg}[radiobtngrp=\SingleAnswerButtonOption, listintoolbar=never]{Question \the\QuestionNum Choice\the\ChoiceNum}{Q\the\QuestionNum C\the\ChoiceNum}{off}%
+        \makebox[\widthof{\faIcon[regular]{\CheckBoxShape}}]%
+        {%
+            \textcolor{green!60!black}{\faCheck}%
+        }%
+    \end{ocg}
+}
+
+
+
+\ExplSyntaxOn
+\def\verifyChoice#1{
+    % Build the lists corresponding to (in)correct OCGs
+    \clist_set:Nn \l_tmpa_clist { #1 }
+    \clist_clear:N \l_good_clist
+    \clist_clear:N \l_bad_clist
+    \clist_clear:N \l_all_clist
+    \newcount\X
+    \X=1
+    \loop
+    \tl_set:Nx \l_tmpa_tl { Q\the\QuestionNum~C\the\X }
+    \clist_put_right:NV \l_all_clist \l_tmpa_tl
+    \clist_if_in:NVTF \l_tmpa_clist { \the\X }
+        { \clist_put_right:NV \l_good_clist \l_tmpa_tl  }
+        { \clist_put_right:NV \l_bad_clist \l_tmpa_tl  }
+      \advance \X by 1
+      \unless\ifnum \X=\the\ChoiceNum
+    \repeat
+
+    % Verify button
+    \actionsocg{}{VQ\the\QuestionNum}{RQ\the\QuestionNum}{%
+    \makebox[0pt][l]{%
+    \begin{ocmd}{\Or{VQ\the\QuestionNum}}
+        \fbox{\strut \color{lightgray} Verify}
+    \end{ocmd}
+    }%
+    \begin{ocmd}{\Not{VQ\the\QuestionNum}}
+        \fbox{\strut Verify}
+    \end{ocmd}
+    }
+
+    \quad
+    % Verify text
+    \begin{ocg}[listintoolbar=never]{Verify Question \the\QuestionNum}{VQ\the\QuestionNum}{off}%
+        \begin{ocmd}{\Or{VQ\the\QuestionNum}}
+        % Perfect: all correct answer, no incorrect answer
+        \makebox[0pt][l]{%
+            \begin{ocmd}{\And{\And{\l_good_clist}, \Not{\Or{\l_bad_clist}}}}
+                \textrm{Perfect!}
+            \end{ocmd}
+        }%
+        % Incorrect
+            \begin{ocmd}{\Not{\And{\And{\l_good_clist}, \Not{\Or{\l_bad_clist}}}}}
+                \textrm{Try\ again...}
+            \end{ocmd}
+        \end{ocmd}
+    \end{ocg}%
+
+    
+    % Reset button
+    \begin{ocg}[listintoolbar=never]{Reset Question \the\QuestionNum}{RQ\the\QuestionNum}{off}%
+    \end{ocg}
+    \hfill
+    \actionsocg{}{RQ\the\QuestionNum}{VQ\the\QuestionNum, \l_all_clist}{%
+    \makebox[0pt][l]{%
+    \begin{ocmd}{\Or{RQ\the\QuestionNum}}
+        \fbox{\strut \color{lightgray} Reset}
+    \end{ocmd}
+    }%
+    \begin{ocmd}{\Not{RQ\the\QuestionNum}}
+        \fbox{\strut Reset}
+    \end{ocmd}
+    }
+    
+
+    % Update the OCG Choice and Question numbers used for identification
+    \global\ChoiceNum=0
+    \global\advance\QuestionNum by 1
+}
+
+
+
+
+
+
+\ExplSyntaxOff
