@@ -1,4 +1,4 @@
-1. Independent Questions
+**1. Independent Questions**
    
 The *independent-questions* package aims to provide easy-to-customize commands.
 The questions are said to be independent because it creates one `Verify` and one `Reset` button for each question.
