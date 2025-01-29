@@ -1,0 +1,48 @@
+\documentclass{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% © 2025-pres. Christian C.
+% MIT licence
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{expl3}
+\usepackage{ocgx2}
+\usepackage{fontawesome5}
+\usepackage{xcolor}
+\usepackage{calc} %\widthof{...}
+\usepackage{independent-questions}
+\parindent=0pt
+
+\begin{document}
+
+This document provides a minimal working example of the package independent-questions.sty.
+Both files can be directly used e.g. in Overleaf to produce an "interactive" PDF.
+The two main advantages are :
+\begin{itemize}
+\item the concise syntax in the .tex document;
+\item the structure of the commands in the package that makes it easy to customize the validation text, the graphic style, the layout, etc.
+\end{itemize}
+
+\section{Example}
+
+\SingleAnswerMode \\
+What color is the sky? \\
+\newChoice Blue \\
+\newChoice Yellow \\
+\verifyChoice{1} \\
+
+\SingleAnswerMode \\
+What shape is the Sun? \\
+\newChoice Square \\
+\newChoice Circle \\
+\verifyChoice{2} \\
+
+\MultipleAnswersMode \\
+What are the two first letters in the alphabet? \\
+\newChoice A \\
+\newChoice B \\
+\newChoice C \\
+\newChoice D \\
+\verifyChoice{1, 2} \\
+
+\end{document}
